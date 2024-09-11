@@ -1,6 +1,16 @@
 # TIENDA FLUTTER
 
-La aplicacion fue creada con el fin de consumir una api localmente y mostrar en pantalla los datos ya creados.
+Esta aplicación Flutter es una interfaz móvil que interactúa con una API desarrollada en Django. 
+La API proporciona funcionalidades para autenticación basada en JWT, gestión de usuarios, categorías y artículos, 
+así como integración con la API de OpenAI ChatGPT para la creación, actualización y eliminación de registros en la base de datos.
+
+## Características
+
+- **Autenticación de Usuario**: Permite a los usuarios registrarse, iniciar sesión y gestionar su sesión mediante JWT.
+- **Gestión de Usuarios**: Los usuarios pueden ver su perfil.
+- **Gestión de Categorías y Artículos**: Los usuarios pueden consultar y gestionar categorías y artículos a través de la aplicación.
+- **Integración con OpenAI**: Utiliza la API de OpenAI ChatGPT para ofrecer funcionalidades avanzadas en la gestión de datos.
+
 
 ## Requisitos
 
