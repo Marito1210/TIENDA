@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_app/services/auth_service.dart';
 
+// ignore: use_key_in_widget_constructors
 class RegisterScreen extends StatefulWidget {
   @override
+  // ignore: library_private_types_in_public_api
   _RegisterScreenState createState() => _RegisterScreenState();
 }
 
@@ -19,11 +21,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
         _passwordController.text,
         _emailController.text,
       );
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      // ignore: use_build_context_synchronously
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
         content: Text('Usuario registrado exitosamente'),
       ));
+      // ignore: use_build_context_synchronously
       Navigator.pushReplacementNamed(context, '/');
     } catch (e) {
+      // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text('Error en el registro: ${e.toString()}'),
       ));
@@ -40,14 +45,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
             // Parte superior morada con logo
             Container(
               height: 250,
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: Colors.purple,
                 borderRadius: BorderRadius.only(
                   bottomLeft: Radius.circular(60),
                   bottomRight: Radius.circular(60),
                 ),
               ),
-              child: Center(
+              child: const Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -69,17 +74,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ),
               ),
             ),
-            SizedBox(height: 90),
+            const SizedBox(height: 90),
 
             // Campos de nombre de usuario, email y contraseña
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: 30),
+              padding: const EdgeInsets.symmetric(horizontal: 30),
               child: Column(
                 children: [
                   TextField(
                     controller: _usernameController,
                     decoration: InputDecoration(
-                      prefixIcon: Icon(Icons.person, color: Colors.purple),
+                      prefixIcon: const Icon(Icons.person, color: Colors.purple),
                       hintText: 'Username',
                       filled: true,
                       fillColor: Colors.purple[50],
@@ -89,11 +94,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ),
                     ),
                   ),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   TextField(
                     controller: _emailController,
                     decoration: InputDecoration(
-                      prefixIcon: Icon(Icons.email, color: Colors.purple),
+                      prefixIcon: const Icon(Icons.email, color: Colors.purple),
                       hintText: 'Email',
                       filled: true,
                       fillColor: Colors.purple[50],
@@ -103,11 +108,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ),
                     ),
                   ),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   TextField(
                     controller: _passwordController,
                     decoration: InputDecoration(
-                      prefixIcon: Icon(Icons.lock, color: Colors.purple),
+                      prefixIcon: const Icon(Icons.lock, color: Colors.purple),
                       hintText: 'Password',
                       filled: true,
                       fillColor: Colors.purple[50],
@@ -118,7 +123,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ),
                     obscureText: true,
                   ),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                 ],
               ),
             ),
@@ -128,27 +133,27 @@ class _RegisterScreenState extends State<RegisterScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 30),
               child: ElevatedButton(
                 onPressed: _register,
-                child: Text('REGISTRAR',
-                style: TextStyle(color: Colors.white), // Aquí cambiamos el color del texto a blanco
-                ),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.purple,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(30),
                   ),
-                  padding: EdgeInsets.symmetric(vertical: 15),
-                  minimumSize: Size(double.infinity, 50),
+                  padding: const EdgeInsets.symmetric(vertical: 15),
+                  minimumSize: const Size(double.infinity, 50),
+                ),
+                child: const Text('REGISTRAR',
+                style: TextStyle(color: Colors.white), // Aquí cambiamos el color del texto a blanco
                 ),
               ),
             ),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
 
             // Botón de iniciar sesión
             TextButton(
               onPressed: () {
                 Navigator.pushNamed(context, '/');
               },
-              child: Text(
+              child: const Text(
                 '¿Ya tienes cuenta? Inicia sesión aquí',
                 style: TextStyle(color: Colors.purple),
               ),

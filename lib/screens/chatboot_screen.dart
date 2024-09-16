@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_app/services/chat_service.dart';
 
 class ChatbootScreen extends StatefulWidget {
+  const ChatbootScreen({super.key});
+
   @override
+  // ignore: library_private_types_in_public_api
   _ChatbootScreenState createState() => _ChatbootScreenState();
 }
 
@@ -10,7 +13,7 @@ class _ChatbootScreenState extends State<ChatbootScreen> {
   final ChatService _chatService = ChatService();
   final TextEditingController _controller = TextEditingController();
 
-  List<Map<String, String>> _messages = [];
+  final List<Map<String, String>> _messages = [];
   bool _isLoading = false;
 
   // Función para enviar el mensaje al chat
@@ -39,7 +42,7 @@ class _ChatbootScreenState extends State<ChatbootScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Chatbot', style: TextStyle(color: Colors.white)),
+        title: const Text('Chatbot', style: TextStyle(color: Colors.white)),
         backgroundColor: Colors.purple, // Color de fondo del AppBar
       ),
       backgroundColor: Colors.grey[200], // Fondo general de la pantalla
@@ -47,7 +50,7 @@ class _ChatbootScreenState extends State<ChatbootScreen> {
         children: [
           Expanded(
             child: ListView.builder(
-              padding: EdgeInsets.all(10.0),
+              padding: const EdgeInsets.all(10.0),
               itemCount: _messages.length,
               itemBuilder: (context, index) {
                 final message = _messages[index];
@@ -57,19 +60,19 @@ class _ChatbootScreenState extends State<ChatbootScreen> {
                       ? Alignment.centerRight
                       : Alignment.centerLeft,
                   child: Container(
-                    margin: EdgeInsets.symmetric(vertical: 5.0),
-                    padding: EdgeInsets.all(12.0),
+                    margin: const EdgeInsets.symmetric(vertical: 5.0),
+                    padding: const EdgeInsets.all(12.0),
                     decoration: BoxDecoration(
                       color: isUserMessage
                           ? Colors.purple[300]
                           : Colors.purple[100],
                       borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(12),
-                        topRight: Radius.circular(12),
+                        topLeft: const Radius.circular(12),
+                        topRight: const Radius.circular(12),
                         bottomLeft:
-                            isUserMessage ? Radius.circular(12) : Radius.zero,
+                            isUserMessage ? const Radius.circular(12) : Radius.zero,
                         bottomRight:
-                            isUserMessage ? Radius.zero : Radius.circular(12),
+                            isUserMessage ? Radius.zero : const Radius.circular(12),
                       ),
                     ),
                     child: Text(
@@ -85,8 +88,8 @@ class _ChatbootScreenState extends State<ChatbootScreen> {
             ),
           ),
           if (_isLoading)
-            Padding(
-              padding: const EdgeInsets.all(8.0),
+            const Padding(
+              padding: EdgeInsets.all(8.0),
               child: CircularProgressIndicator(),
             ),
           Padding(
@@ -101,7 +104,7 @@ class _ChatbootScreenState extends State<ChatbootScreen> {
                       hintText: 'Escribe tu mensaje...',
                       filled: true,
                       fillColor: Colors.white,
-                      contentPadding: EdgeInsets.symmetric(
+                      contentPadding: const EdgeInsets.symmetric(
                           horizontal: 16.0, vertical: 10.0),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(30.0),
@@ -110,7 +113,7 @@ class _ChatbootScreenState extends State<ChatbootScreen> {
                     ),
                   ),
                 ),
-                SizedBox(width: 8.0),
+                const SizedBox(width: 8.0),
                 // Botón de envío estilizado
                 GestureDetector(
                   onTap: () {
@@ -120,7 +123,7 @@ class _ChatbootScreenState extends State<ChatbootScreen> {
                       _controller.clear();
                     }
                   },
-                  child: CircleAvatar(
+                  child: const CircleAvatar(
                     radius: 25,
                     backgroundColor: Colors.purple,
                     child: Icon(Icons.send, color: Colors.white),

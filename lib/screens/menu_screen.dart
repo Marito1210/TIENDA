@@ -6,10 +6,12 @@ import 'package:flutter_app/screens/users_screen.dart';
 import 'package:flutter_app/screens/chatboot_screen.dart';
 
 class MenuScreen extends StatelessWidget {
+  const MenuScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Menú Principal')),
+      appBar: AppBar(title: const Text('Menú Principal')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: GridView.count(
@@ -18,9 +20,9 @@ class MenuScreen extends StatelessWidget {
           mainAxisSpacing: 10,
           children: [
             _buildMenuItem(Icons.person, 'Perfil', context, ProfileScreen()),
-            _buildMenuItem(Icons.article, 'Artículos', context, ArticlesScreen()),
+            _buildMenuItem(Icons.article, 'Artículos', context, const ArticlesScreen()),
             _buildMenuItem(Icons.people, 'Usuarios', context, UsersScreen()),
-            _buildMenuItem(Icons.chat, 'Chatboot', context, ChatbootScreen()),
+            _buildMenuItem(Icons.chat, 'Chatboot', context, const ChatbootScreen()),
           ],
         ),
       ),
@@ -43,8 +45,8 @@ class MenuScreen extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Icon(icon, size: 50, color: const Color.fromARGB(255, 177, 33, 165)),
-              SizedBox(height: 10),
-              Text(label, style: TextStyle(fontSize: 18)),
+              const SizedBox(height: 10),
+              Text(label, style: const TextStyle(fontSize: 18)),
             ],
           ),
         ),

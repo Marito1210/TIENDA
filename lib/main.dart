@@ -12,6 +12,7 @@ void main() {
   runApp(MyApp());
 }
 
+// ignore: use_key_in_widget_constructors
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -20,13 +21,13 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(primarySwatch: Colors.blue),
       initialRoute: '/',
       routes: {
-        '/': (context) => LoginScreen(),
+        '/': (context) => const LoginScreen(),
         '/register': (context) => RegisterScreen(),
-        '/menu': (context) => MenuScreen(),
+        '/menu': (context) => const MenuScreen(),
         '/profile': (context) => ProfileScreen(),
-        '/articles': (context) => ArticlesScreen(),
+        '/articles': (context) => const ArticlesScreen(),
         '/users': (context) => UsersScreen(),
-        '/chatboot': (context) => ChatbootScreen(),
+        '/chatboot': (context) => const ChatbootScreen(),
       },
     );
   }

@@ -4,7 +4,7 @@ import 'package:http/http.dart' as http;
 
 class AuthService {
   final String baseUrl = 'http://10.0.2.2:8000/api';
-  final FlutterSecureStorage _storage = FlutterSecureStorage();
+  final FlutterSecureStorage _storage = const FlutterSecureStorage();
 
   // Función para registrar usuarios
   Future<void> register(String username, String password, String email) async {
@@ -71,6 +71,7 @@ class AuthService {
 
     if (response.statusCode == 200) {
       final jsonResponse = jsonDecode(response.body);
+      // ignore: avoid_print
       print('Respuesta JSON: $jsonResponse');
 
       if (jsonResponse is Map && jsonResponse.containsKey('data')) {
@@ -140,6 +141,7 @@ Future<Map<String, dynamic>> getProfile() async {
 
     if (response.statusCode == 200) {
       final jsonResponse = jsonDecode(response.body);
+      // ignore: avoid_print
       print('Respuesta JSON de categorías: $jsonResponse');
 
       if (jsonResponse is Map && jsonResponse.containsKey('data')) {

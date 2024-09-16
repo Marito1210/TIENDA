@@ -4,7 +4,7 @@ import 'package:http/http.dart' as http;
 
 class ChatService {
   final String baseUrl = 'http://10.0.2.2:8000/api';
-  final FlutterSecureStorage _storage = FlutterSecureStorage();
+  final FlutterSecureStorage _storage = const FlutterSecureStorage();
 
   // Función para enviar el comando y recibir la respuesta del chat
   Future<String> sendChatCommand(String command) async {
