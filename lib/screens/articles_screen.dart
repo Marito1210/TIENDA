@@ -15,6 +15,7 @@ class _ArticlesScreenState extends State<ArticlesScreen> {
   List<dynamic> categories = [];
   bool isLoading = true;
 
+//se llama al método fetchData() para obtener los artículos y categorías de la API.
   @override
   void initState() {
     super.initState();
