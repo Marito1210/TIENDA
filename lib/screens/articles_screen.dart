@@ -15,7 +15,6 @@ class _ArticlesScreenState extends State<ArticlesScreen> {
   List<dynamic> categories = [];
   bool isLoading = true;
 
-//se llama al método fetchData() para obtener los artículos y categorías de la API.
   @override
   void initState() {
     super.initState();
@@ -40,15 +39,321 @@ class _ArticlesScreenState extends State<ArticlesScreen> {
     }
   }
 
+  Future<void> deleteArticle(int id) async {
+    try {
+      await authService.deleteArticulo(id);
+      await fetchData();
+    } catch (e) {
+      // ignore: avoid_print
+      print('Error al eliminar el artículo: $e');
+    }
+  }
+
+  Future<void> deleteCategory(int id) async {
+    try {
+      await authService.deleteCategoria(id);
+      await fetchData();
+    } catch (e) {
+      // ignore: avoid_print
+      print('Error al eliminar la categoría: $e');
+    }
+  }
+
+  void showEditArticleDialog(dynamic article) {
+    final nameController = TextEditingController(text: article['name']);
+    final descriptionController = TextEditingController(text: article['description']);
+    final priceController = TextEditingController(text: article['price'].toString());
+    final stockController = TextEditingController(text: article['stock'].toString());
+    final categoryController = TextEditingController(text: article['category'].toString());
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Editar Artículo'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: nameController,
+                decoration: const InputDecoration(labelText: 'Nombre'),
+              ),
+              TextField(
+                controller: descriptionController,
+                decoration: const InputDecoration(labelText: 'Descripción'),
+              ),
+              TextField(
+                controller: priceController,
+                decoration: const InputDecoration(labelText: 'Precio'),
+                keyboardType: TextInputType.number,
+              ),
+              TextField(
+                controller: stockController,
+                decoration: const InputDecoration(labelText: 'Stock'),
+                keyboardType: TextInputType.number,
+              ),
+               TextField(
+                controller: categoryController,
+                decoration: const InputDecoration(labelText: 'Category'),
+                keyboardType: TextInputType.number,
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Cancelar'),
+            ),
+            TextButton(
+              onPressed: () async {
+                await authService.editArticulo(
+                  article['id'],
+                  nameController.text,
+                  descriptionController.text,
+                  double.tryParse(priceController.text) ?? 0.0,
+                  int.tryParse(stockController.text) ?? 0,
+                  int.tryParse(categoryController.text) ?? 0,
+                );
+                await fetchData();
+                // ignore: use_build_context_synchronously
+                Navigator.of(context).pop();
+              },
+              child: const Text('Guardar'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void showEditCategoryDialog(dynamic category) {
+    final nameController = TextEditingController(text: category['name']);
+    final descriptionController = TextEditingController(text: category['description']);
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Editar Categoría'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: nameController,
+                decoration: const InputDecoration(labelText: 'Nombre'),
+              ),
+              TextField(
+                controller: descriptionController,
+                decoration: const InputDecoration(labelText: 'Descripción'),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Cancelar'),
+            ),
+            TextButton(
+              onPressed: () async {
+                await authService.editCategoria(
+                  category['id'],
+                  nameController.text,
+                  descriptionController.text,
+                );
+                await fetchData();
+                // ignore: use_build_context_synchronously
+                Navigator.of(context).pop();
+              },
+              child: const Text('Guardar'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void showAddArticleDialog() {
+    final nameController = TextEditingController();
+    final descriptionController = TextEditingController();
+    final priceController = TextEditingController();
+    final stockController = TextEditingController();
+    final categoryController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Agregar Artículo'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: nameController,
+                decoration: const InputDecoration(labelText: 'Nombre'),
+              ),
+              TextField(
+                controller: descriptionController,
+                decoration: const InputDecoration(labelText: 'Descripción'),
+              ),
+              TextField(
+                controller: priceController,
+                decoration: const InputDecoration(labelText: 'Precio'),
+                keyboardType: TextInputType.number,
+              ),
+              TextField(
+                controller: stockController,
+                decoration: const InputDecoration(labelText: 'Stock'),
+                keyboardType: TextInputType.number,
+              ),
+              TextField(
+                controller: categoryController,
+                decoration: const InputDecoration(labelText: 'Category'),
+                keyboardType: TextInputType.number,
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Cancelar'),
+            ),
+            TextButton(
+              onPressed: () async {
+                await authService.addArticulo(
+                  nameController.text,
+                  descriptionController.text,
+                  double.tryParse(priceController.text) ?? 0.0,
+                  int.tryParse(stockController.text) ?? 0,
+                  int.tryParse(categoryController.text) ?? 0,
+                );
+                await fetchData();
+                // ignore: use_build_context_synchronously
+                Navigator.of(context).pop();
+              },
+              child: const Text('Agregar'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void showAddCategoryDialog() {
+    final nameController = TextEditingController();
+    final descriptionController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Agregar Categoría'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: nameController,
+                decoration: const InputDecoration(labelText: 'Nombre'),
+              ),
+              TextField(
+                controller: descriptionController,
+                decoration: const InputDecoration(labelText: 'Descripción'),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Cancelar'),
+            ),
+            TextButton(
+              onPressed: () async {
+                await authService.addCategoria(
+                  nameController.text,
+                  descriptionController.text,
+                );
+                await fetchData();
+                // ignore: use_build_context_synchronously
+                Navigator.of(context).pop();
+              },
+              child: const Text('Agregar'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+//metodo eliminar articulo
+  void showDeleteArticleDialog(int id) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Eliminar Artículo'),
+          content: const Text('¿Estás seguro de que deseas eliminar este artículo?'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Cancelar'),
+            ),
+            TextButton(
+              onPressed: () {
+                deleteArticle(id);
+                Navigator.of(context).pop();
+              },
+              child: const Text('Eliminar'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+//metodo eliminar categoria
+  void showDeleteCategoryDialog(int id) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Eliminar Categoría'),
+          content: const Text('¿Estás seguro de que deseas eliminar esta categoría?'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Cancelar'),
+            ),
+            TextButton(
+              onPressed: () {
+                deleteCategory(id);
+                Navigator.of(context).pop();
+              },
+              child: const Text('Eliminar'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
           'Artículos y Categorías',
-           style: TextStyle(color: Colors.white),
-           ),
-        backgroundColor: Colors.purple, // Color morado para la barra de la aplicación
+          style: TextStyle(color: Colors.white),
+        ),
+        backgroundColor: Colors.purple,
       ),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -56,127 +361,117 @@ class _ArticlesScreenState extends State<ArticlesScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Título de artículos
                   Padding(
                     padding: const EdgeInsets.all(16.0),
-                    child: Text(
-                      'Artículos',
-                      style: TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.purple[800], // Color morado oscuro
-                      ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Artículos',
+                          style: TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.purple[800],
+                          ),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.add, color: Colors.purple),
+                          onPressed: showAddArticleDialog,
+                        ),
+                      ],
                     ),
                   ),
-                  
-                  // Lista de artículos
+
                   articles.isEmpty
                       ? const Center(child: Text('No hay artículos disponibles'))
-                      : ListView.builder(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          itemCount: articles.length,
-                          itemBuilder: (context, index) {
-                            final article = articles[index];
-                            return Card(
-                              margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-                              elevation: 4,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(15.0),
-                              ),
-                              child: ListTile(
-                                contentPadding: const EdgeInsets.all(16.0),
-                                leading: Icon(
-                                  Icons.article,
-                                  color: Colors.purple[300], // Icono morado claro
-                                  size: 40,
-                                ),
-                                title: Text(
-                                  article['name'] ?? 'Sin título',
-                                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                                ),
-                                subtitle: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
+                      : SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: DataTable(
+                            columns: const [
+                              DataColumn(label: Text('ID')),
+                              DataColumn(label: Text('Nombre')),
+                              DataColumn(label: Text('Descripción')),
+                              DataColumn(label: Text('Precio')),
+                              DataColumn(label: Text('Stock')),
+                              DataColumn(label: Text('ID_Categoria')),
+                              DataColumn(label: Text('Acciones')),
+                            ],
+                            rows: articles.map<DataRow>((article) {
+                              return DataRow(cells: [
+                                DataCell(Text(article['id'].toString())),
+                                DataCell(Text(article['name'])),
+                                DataCell(Text(article['description'])),
+                                DataCell(Text(article['price'].toString())),
+                                DataCell(Text(article['stock'].toString())),
+                                DataCell(Text(article['category'].toString())),
+                                DataCell(Row(
                                   children: [
-                                    Text(
-                                      article['description'] ?? 'Sin descripción',
-                                      style: const TextStyle(fontSize: 16),
+                                    IconButton(
+                                      icon: const Icon(Icons.edit, color: Color.fromARGB(255, 166, 33, 243)),
+                                      onPressed: () => showEditArticleDialog(article),
                                     ),
-                                    const SizedBox(height: 8.0),
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text(
-                                          'Precio: \$${article['price'] ?? 'No disponible'}',
-                                          style: const TextStyle(fontSize: 16, color: Colors.green),
-                                        ),
-                                        Text(
-                                          'Stock: ${article['stock'] ?? 'No disponible'}',
-                                          style: const TextStyle(fontSize: 16, color: Colors.red),
-                                        ),
-                                      ],
+                                    IconButton(
+                                      icon: const Icon(Icons.delete, color: Colors.red),
+                                      onPressed: () => showDeleteArticleDialog(article['id']),
                                     ),
                                   ],
-                                ),
-                                onTap: () {
-                                  // Acción al tocar el artículo
-                                },
-                              ),
-                            );
-                          },
+                                )),
+                              ]);
+                            }).toList(),
+                          ),
                         ),
-
-                  const SizedBox(height: 20), // Separador entre artículos y categorías
-
-                  // Título de categorías
+                  const SizedBox(height: 32),
                   Padding(
                     padding: const EdgeInsets.all(16.0),
-                    child: Text(
-                      'Categorías',
-                      style: TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.purple[800], // Color morado oscuro
-                      ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Categorías',
+                          style: TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.purple[800],
+                          ),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.add, color: Colors.purple),
+                          onPressed: showAddCategoryDialog,
+                        ),
+                      ],
                     ),
                   ),
-
-                  // Lista de categorías
                   categories.isEmpty
                       ? const Center(child: Text('No hay categorías disponibles'))
-                      : ListView.builder(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          itemCount: categories.length,
-                          itemBuilder: (context, index) {
-                            final category = categories[index];
-                            return Card(
-                              margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-                              elevation: 4,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(15.0),
-                              ),
-                              child: ListTile(
-                                contentPadding: const EdgeInsets.all(16.0),
-                                leading: Icon(
-                                  Icons.category,
-                                  color: Colors.purple[300], // Icono morado claro
-                                  size: 40,
-                                ),
-                                title: Text(
-                                  category['name'] ?? 'Sin nombre',
-                                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                                ),
-                                subtitle: Text(
-                                  category['description'] ?? 'Sin descripción',
-                                  style: const TextStyle(fontSize: 16),
-                                ),
-                                onTap: () {
-                                  // Acción al tocar la categoría
-                                },
-                              ),
-                            );
-                          },
+                      : SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: DataTable(
+                            columns: const [
+                              DataColumn(label: Text('ID')),
+                              DataColumn(label: Text('Nombre')),
+                              DataColumn(label: Text('Descripción')),
+                              DataColumn(label: Text('Acciones')),
+                            ],
+                            rows: categories.map<DataRow>((category) {
+                              return DataRow(cells: [
+                                DataCell(Text(category['id'].toString())),
+                                DataCell(Text(category['name'])),
+                                DataCell(Text(category['description'])),
+                                DataCell(Row(
+                                  children: [
+                                    IconButton(
+                                      icon: const Icon(Icons.edit, color: Color.fromARGB(255, 166, 33, 243)),
+                                      onPressed: () => showEditCategoryDialog(category),
+                                    ),
+                                    IconButton(
+                                      icon: const Icon(Icons.delete, color: Colors.red),
+                                      onPressed: () => showDeleteCategoryDialog(category['id']),
+                                    ),
+                                  ],
+                                )),
+                              ]);
+                            }).toList(),
+                          ),
                         ),
                 ],
               ),
