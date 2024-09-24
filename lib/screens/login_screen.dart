@@ -137,7 +137,8 @@ class _LoginScreenState extends State<LoginScreen> {
                   padding: const EdgeInsets.symmetric(vertical: 15),
                   minimumSize: const Size(double.infinity, 50),
                 ),
-                child: const Text('Iniciar Sesion'),
+                child: const Text('Iniciar Sesion,', style: TextStyle(
+                          color: Colors.white,)),
               ),
             ),
             const SizedBox(height: 10),

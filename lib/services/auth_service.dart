@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
+import 'dart:io';
 
 class AuthService {
  final String baseUrl = 'http://192.168.1.10:8000/api';
@@ -152,32 +153,47 @@ class AuthService {
     }
   }
 
-  // Método para agregar un artículo
-  Future<void> addArticulo(String name, String description, double price, int stock, int category) async {
-    final token = await getToken();
-    final url = Uri.parse('$baseUrl/articulos/');
+ // Método para agregar un artículo con imagen
+Future<void> addArticuloWithImage(
+    String name,
+    String description,
+    double price,
+    int stock,
+    int category,
+    double warrantyperiod,
+    File imageFile) async {
+  final token = await getToken();
 
-    final response = await http.post(
-      url,
-      headers: {
-        'Authorization': 'Bearer $token',
-        'Content-Type': 'application/json',
-      },
-      body: jsonEncode({
-        'name': name,
-        'description': description,
-        'price': price,
-        'stock': stock,
-        'category': category,
-      }),
-    );
-
-    if (response.statusCode == 201) {
-      // Artículo agregado exitosamente
-    } else {
-      throw Exception('Error al agregar el artículo: ${response.body}');
-    }
+  // Verifica si el token es válido
+  if (token == null) {
+    throw Exception('No se ha encontrado un token de acceso');
   }
+
+  final url = Uri.parse('$baseUrl/articulos/');
+
+  final request = http.MultipartRequest('POST', url)
+    ..headers['Authorization'] = 'Bearer $token'
+    ..fields['name'] = name
+    ..fields['description'] = description
+    ..fields['price'] = price.toString()
+    ..fields['stock'] = stock.toString()
+    ..fields['category'] = category.toString()
+    ..fields['warranty_period'] = warrantyperiod.toString()
+    ..files.add(await http.MultipartFile.fromPath('image', imageFile.path));
+
+  // Envía la solicitud y obtiene la respuesta
+  final response = await request.send();
+  final responseBody = await http.Response.fromStream(response);
+
+  // Verifica el estado de la respuesta
+  if (response.statusCode == 201) {
+    // Artículo agregado exitosamente
+  } else {
+    // Lanza una excepción con la respuesta del servidor
+    throw Exception('Error al agregar el artículo: ${responseBody.body}');
+  }
+}
+
 
   // Método para agregar una categoría
   Future<void> addCategoria(String name, String description) async {
@@ -204,7 +220,7 @@ class AuthService {
   }
 
   // Método para editar un artículo
-  Future<void> editArticulo(int id, String name, String description, double price, int stock, int category) async {
+  Future<void> editArticulo(int id, String name, String description, double price, int stock, int category, double warrantyperiod, File? selectedImage) async {
     final token = await getToken();
     final url = Uri.parse('$baseUrl/articulos/$id/');
 
@@ -220,6 +236,7 @@ class AuthService {
         'price': price,
         'stock': stock,
         'category': category,
+        'warranty_period': warrantyperiod,
       }),
     );
 
@@ -289,4 +306,66 @@ class AuthService {
       throw Exception('Error al eliminar la categoría: ${response.body}');
     }
   }
+
+  //filtros articulos y categorias por id
+ Future<Map<String, dynamic>> getArticuloById(int id) async {
+  final token = await getToken();
+  final url = Uri.parse('$baseUrl/articulos/$id');
+
+  final response = await http.get(
+    url,
+    headers: {
+      'Authorization': 'Bearer $token',
+      'Content-Type': 'application/json',
+    },
+  );
+
+  if (response.statusCode == 200) {
+    return json.decode(response.body);
+  } else {
+    throw Exception('Error al obtener el artículo');
+  }
+}
+
+
+  Future<Map<String, dynamic>> getCategoriaById(int id) async {
+  final token = await getToken();
+  final url = Uri.parse('$baseUrl/categorias/$id');
+
+  final response = await http.get(
+    url,
+    headers: {
+      'Authorization': 'Bearer $token',
+      'Content-Type': 'application/json',
+    },
+  );
+
+  if (response.statusCode == 200) {
+    return json.decode(response.body);
+  } else {
+    throw Exception('Error al obtener una categoria');
+  }
+}
+
+//funcion para cargar imagen
+Future<void> uploadProfileImage(File imageFile) async {
+  final token = await getToken();
+  final url = Uri.parse('$baseUrl/usuarios/perfil/');
+
+  // Cambiamos el método a PATCH
+  final request = http.MultipartRequest('PATCH', url)
+    ..headers['Authorization'] = 'Bearer $token'
+    ..files.add(await http.MultipartFile.fromPath('image', imageFile.path));
+
+  final response = await request.send();
+
+  // Verifica el estado de la respuesta
+  if (response.statusCode != 200) {
+    throw Exception('Error al subir la imagen: ${response.reasonPhrase}');
+  }
+
+  print('Imagen de perfil actualizada exitosamente'); // Mensaje de éxito
+}
+
+
 }
