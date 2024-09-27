@@ -1,10 +1,11 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart'; // Para seleccionar la imagen
 import 'package:flutter_app/services/auth_service.dart';
-import 'package:image_picker/image_picker.dart';
 
-// ignore: use_key_in_widget_constructors
 class ProfileScreen extends StatefulWidget {
+  const ProfileScreen({super.key});
+
   @override
   // ignore: library_private_types_in_public_api
   _ProfileScreenState createState() => _ProfileScreenState();
@@ -14,7 +15,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final AuthService authService = AuthService();
   Map<String, dynamic>? userProfile;
   bool isLoading = true;
-  File? _imageFile;
+  File? _image; // Para almacenar la imagen seleccionada
 
   @override
   void initState() {
@@ -25,7 +26,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Future<void> fetchUserProfile() async {
     try {
       final profile = await authService.getProfile();
-      print('Perfil del usuario: $profile'); // Agregado para verificar el perfil
       setState(() {
         userProfile = profile;
         isLoading = false;
@@ -34,30 +34,122 @@ class _ProfileScreenState extends State<ProfileScreen> {
       setState(() {
         isLoading = false;
       });
-      // ignore: avoid_print
       print('Error al obtener el perfil del usuario: $e');
     }
   }
 
-  Future<void> _pickImage() async {
-    final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
-
-    if (pickedFile != null) {
-      setState(() {
-        _imageFile = File(pickedFile.path);
-      });
+  String _buildImageUrl(String imagePath) {
+    if (imagePath.startsWith('http')) {
+      return imagePath;
+    } else {
+      return 'http://192.168.1.10:8000$imagePath';
     }
   }
 
-  Future<void> _uploadImage() async {
-    if (_imageFile != null) {
-      try {
-        await authService.uploadProfileImage(_imageFile!);
-        // Actualiza el perfil después de subir la imagen
-        await fetchUserProfile(); 
-      } catch (e) {
-        print('Error al subir la imagen: $e');
-      }
+  Future<void> _updateProfile(String username, String email, String password) async {
+    try {
+      await authService.updateProfile(username, email, password, _image);
+      fetchUserProfile(); // Refrescar el perfil después de actualizarlo
+      // ignore: use_build_context_synchronously
+      Navigator.of(context).pop(); // Cerrar el diálogo
+      // ignore: use_build_context_synchronously
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text('Perfil actualizado con éxito'),
+        backgroundColor: Colors.green,
+      ));
+    } catch (e) {
+      // ignore: avoid_print
+      print('Error al actualizar el perfil: $e');
+      // ignore: use_build_context_synchronously
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Error al actualizar el perfil: $e'),
+        backgroundColor: Colors.red,
+      ));
+    }
+  }
+
+  Future<void> _deleteProfile() async {
+    try {
+      await authService.deleteProfile(); // Llama a la función de eliminación del perfil
+      Navigator.of(context).pop(); // Cerrar la pantalla de perfil después de eliminar
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text('Perfil eliminado con éxito'),
+        backgroundColor: Colors.green,
+      ));
+      // Puedes redirigir a la pantalla de inicio de sesión o cualquier otra pantalla aquí
+    } catch (e) {
+      print('Error al eliminar el perfil: $e');
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Error al eliminar el perfil: $e'),
+        backgroundColor: Colors.red,
+      ));
+    }
+  }
+
+  Future<void> _showUpdateProfileDialog() async {
+    final TextEditingController usernameController = TextEditingController(text: userProfile?['username']);
+    final TextEditingController emailController = TextEditingController(text: userProfile?['email']);
+    final TextEditingController passwordController = TextEditingController();
+
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Actualizar Perfil'),
+          content: SingleChildScrollView(
+            child: Column(
+              children: [
+                TextField(
+                  controller: usernameController,
+                  decoration: const InputDecoration(labelText: 'Nombre de usuario'),
+                ),
+                TextField(
+                  controller: emailController,
+                  decoration: const InputDecoration(labelText: 'Correo electrónico'),
+                ),
+                TextField(
+                  controller: passwordController,
+                  decoration: const InputDecoration(labelText: 'Contraseña (dejar en blanco si no desea cambiarla)'),
+                  obscureText: true,
+                ),
+                const SizedBox(height: 10),
+                _image == null
+                    ? TextButton.icon(
+                        onPressed: _pickImage,
+                        icon: const Icon(Icons.image),
+                        label: const Text('Seleccionar imagen'),
+                      )
+                    : Image.file(_image!, height: 100),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Cancelar'),
+            ),
+            TextButton(
+              onPressed: () {
+                _updateProfile(
+                  usernameController.text,
+                  emailController.text,
+                  passwordController.text.isEmpty ? '' : passwordController.text,
+                );
+              },
+              child: const Text('Actualizar'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _pickImage() async {
+    final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      setState(() {
+        _image = File(pickedFile.path);
+      });
     }
   }
 
@@ -65,11 +157,31 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'Perfil',
-          style: TextStyle(color: Colors.white),
-        ),
+        title: const Text('Perfil', style: TextStyle(color: Colors.white)),
         backgroundColor: Colors.purple,
+        actions: [
+          PopupMenuButton<String>(
+            icon: const Icon(Icons.more_vert, color: Colors.white, ), // Icono de tres puntos
+             
+            onSelected: (String result) {
+              if (result == 'update') {
+                _showUpdateProfileDialog(); // Muestra el diálogo de actualización de perfil
+              } else if (result == 'delete') {
+                _deleteProfile(); // Llama a la función para eliminar el perfil
+              }
+            },
+            itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+              const PopupMenuItem<String>(
+                value: 'update',
+                child: Text('Actualizar perfil'),
+              ),
+              const PopupMenuItem<String>(
+                value: 'delete',
+                child: Text('Eliminar perfil'),
+              ),
+            ],
+          ),
+        ],
       ),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -81,27 +193,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       const SizedBox(height: 30),
-                      // Círculo con foto de usuario
                       CircleAvatar(
-                        backgroundImage: _imageFile != null
-                            ? FileImage(_imageFile!) // Muestra la imagen seleccionada
-                            : userProfile!['image'] != null
-                                ? NetworkImage('http://192.168.1.10:8000${userProfile!['image']}')
-                                : const AssetImage('assets/user_placeholder.png'),
                         radius: 80,
-                        backgroundColor: Colors.purple[100],
+                        backgroundColor: userProfile!['image'] != null
+                            ? Colors.transparent
+                            : Colors.purple[100],
+                        backgroundImage: userProfile!['image'] != null
+                            ? NetworkImage(_buildImageUrl(userProfile!['image']))
+                            : null,
+                        child: userProfile!['image'] == null
+                            ? const Icon(Icons.person, size: 80, color: Colors.purple)
+                            : null,
                       ),
-                      const SizedBox(height: 10),
-                      ElevatedButton(
-                        onPressed: _pickImage,
-                        child: const Text('Seleccionar Imagen'),
-                      ),
-                      const SizedBox(height: 10),
-                      ElevatedButton(
-                        onPressed: _uploadImage,
-                        child: const Text('Subir Imagen'),
-                      ),
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 20),
                       Card(
                         margin: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 16.0),
                         elevation: 4,
@@ -114,11 +218,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 children: [
                                   const Icon(Icons.person, color: Colors.purple),
                                   const SizedBox(width: 10),
-                                  Expanded(
-                                    child: Text(
-                                      'Nombre: ${userProfile!['username'] ?? 'Sin nombre'}',
-                                      style: const TextStyle(fontSize: 18),
-                                    ),
+                                  Text(
+                                    userProfile!['username'] ?? 'Sin nombre',
+                                    style: const TextStyle(fontSize: 18),
                                   ),
                                 ],
                               ),
@@ -127,11 +229,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 children: [
                                   const Icon(Icons.email, color: Colors.purple),
                                   const SizedBox(width: 10),
-                                  Expanded(
-                                    child: Text(
-                                      'Correo: ${userProfile!['email'] ?? 'Sin correo'}',
-                                      style: const TextStyle(fontSize: 18),
-                                    ),
+                                  Text(
+                                    userProfile!['email'] ?? 'Sin email',
+                                    style: const TextStyle(fontSize: 18),
                                   ),
                                 ],
                               ),

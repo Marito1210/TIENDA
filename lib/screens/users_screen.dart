@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_app/services/auth_service.dart';
 
-// ignore: use_key_in_widget_constructors
 class UsersScreen extends StatefulWidget {
   @override
-  // ignore: library_private_types_in_public_api
   _UsersScreenState createState() => _UsersScreenState();
 }
 
@@ -30,7 +28,6 @@ class _UsersScreenState extends State<UsersScreen> {
       setState(() {
         isLoading = false;
       });
-      // ignore: avoid_print
       print('Error al obtener los usuarios: $e');
     }
   }
@@ -39,10 +36,11 @@ class _UsersScreenState extends State<UsersScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Usuarios Registrados',
-        style: TextStyle(color: Colors.white),
+        title: const Text(
+          'Usuarios Registrados',
+          style: TextStyle(color: Colors.white),
         ),
-        backgroundColor: Colors.purple, // Color morado para la barra de la aplicación
+        backgroundColor: Colors.purple,
       ),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -55,7 +53,7 @@ class _UsersScreenState extends State<UsersScreen> {
                     itemBuilder: (context, index) {
                       final user = users[index];
                       return Card(
-                        elevation: 4, // Elevación para darle un efecto de sombra
+                        elevation: 4,
                         margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10.0),
@@ -63,7 +61,9 @@ class _UsersScreenState extends State<UsersScreen> {
                         child: ListTile(
                           contentPadding: const EdgeInsets.all(16.0),
                           leading: CircleAvatar(
-                            backgroundImage: const AssetImage('assets/user_placeholder.png'), // Imagen de usuario predeterminada
+                            backgroundImage: user['image'] != null && user['image'].isNotEmpty
+                                ? NetworkImage(user['image']) // Utiliza la URL de la imagen del usuario
+                                : null, // Sin imagen predeterminada
                             radius: 30,
                             backgroundColor: Colors.purple[100],
                           ),
@@ -72,14 +72,14 @@ class _UsersScreenState extends State<UsersScreen> {
                             style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
-                              color: Colors.purple[800], // Texto en morado oscuro
+                              color: Colors.purple[800],
                             ),
                           ),
                           subtitle: Text(
                             user['email'] ?? 'Sin email',
                             style: TextStyle(fontSize: 16, color: Colors.grey[600]),
                           ),
-                          trailing: const Icon(Icons.arrow_forward_ios, color: Colors.purple), // Icono a la derecha
+                          trailing: const Icon(Icons.arrow_forward_ios, color: Colors.purple),
                           onTap: () {
                             // Aquí podrías mostrar más detalles del usuario si lo deseas
                           },

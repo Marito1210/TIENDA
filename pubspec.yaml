@@ -31,10 +31,13 @@ dependencies:
   flutter:
     sdk: flutter
   image_picker: ^1.1.2
-  http: ^1.2.2 
-  flutter_secure_storage: ^9.2.2 # o la última versión disponible
-  assets:
-    - assets/user_placeholder.png
+  http: ^1.2.2
+  flutter_secure_storage: ^9.2.2
+  mime: ^1.0.6
+  http_parser: ^4.0.2  # Cambiado a una versión compatible
+
+
+
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
