@@ -4,8 +4,6 @@ import 'package:flutter_speed_dial/flutter_speed_dial.dart'; // Importa el paque
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 
-
-
 class ArticlesScreen extends StatefulWidget {
   const ArticlesScreen({super.key});
 
@@ -29,12 +27,11 @@ class _ArticlesScreenState extends State<ArticlesScreen> {
     _loadUserProfile(); // Cargar el perfil del usuario logueado
     _loadData(); // Cargar datos iniciales
   }
-
   Future<void> _loadUserProfile() async {
     try {
       final profile = await AuthService().getProfile();
       setState(() {
-        userId = profile['Id']; // Almacenamos el username del usuario logueado
+        userId = profile['Id']; // Almacenamos el user del usuario logueado
       });
     } catch (e) {
       print('Error al obtener el perfil del usuario: $e');
@@ -326,10 +323,10 @@ SpeedDial buildSpeedDial() {
     ],
   );
 }
+ 
  Future<void> _loadData() async {
     _articulosFuture = AuthService().getArticulos();
     _categoriasFuture = AuthService().getCategorias();
-    // Aquí podrías agregar lógica adicional si necesitas manejar el estado de carga
   }
 
    @override
@@ -372,9 +369,14 @@ SpeedDial buildSpeedDial() {
                   } else if (snapshot.hasError) {
                     return Text('Error: ${snapshot.error}');
                   } else if (snapshot.hasData) {
-                    _articulosFiltrados = snapshot.data!.where((articulo) {
-                      return articulo['name'].toLowerCase().contains(_searchTerm); // Filtrar por nombre
-                    }).toList();
+                 _articulosFiltrados = snapshot.data!.where((articulo) {
+                 final searchTermLower = _searchTerm.toLowerCase(); // Convertir a minúsculas el término de búsqueda
+                 final nameMatches = articulo['name'].toLowerCase().contains(searchTermLower); // Filtrar por nombre
+                 final descriptionMatches = articulo['description'].toLowerCase().contains(searchTermLower); // Filtrar por descripción
+                 final categoryNameMatches = articulo['category_name'].toLowerCase().contains(searchTermLower); // Filtrar por categoría
+                 return nameMatches || descriptionMatches || categoryNameMatches; // Retornar verdadero si cualquiera de los filtros coincide
+                 }).toList();
+
 
                     return PaginatedArticlesTable(articulos: _articulosFiltrados, userId: userId);
                   } else {
@@ -402,11 +404,8 @@ SpeedDial buildSpeedDial() {
         ),
       ),
       // Aquí se coloca el SpeedDial
-      floatingActionButton: Positioned(
-        left: 20,
-        bottom: 20,
-        child: buildSpeedDial(),
-      ),
+      floatingActionButton: buildSpeedDial(), // No necesitas Positioned aquí
+    floatingActionButtonLocation: FloatingActionButtonLocation.startFloat, // Mueve el botón a la izquierda
     );
   }
 }
@@ -460,14 +459,11 @@ class ArticulosDataTableSource extends DataTableSource {
                 color: esFavorito ? Colors.red : Colors.black,
               ),
               onPressed: () {
-                int idArticulo;
                 try {
-                  idArticulo = int.parse(articulo['id'].toString());
                 } catch (e) {
                   print('Error al convertir el ID del artículo: $e');
                   return; // Salir si no se puede convertir el ID
                 }
-                
                 // Lógica para agregar o eliminar de favoritos
                 if (esFavorito) {
                 AuthService().eliminarDeFavoritos(articulo['id'].toString()).then((_) {
@@ -631,10 +627,12 @@ class _PaginatedCategoriasTableState extends State<PaginatedCategoriasTable> {
   void _filterCategorias() {
     String query = _searchController.text.toLowerCase();
     setState(() {
-      _filteredCategorias = _categorias.where((categoria) {
-        String name = categoria['name'].toLowerCase();
-        return name.contains(query);
-      }).toList();
+     _filteredCategorias = _categorias.where((categoria) {
+     String name = categoria['name'].toLowerCase();
+     String description = categoria['description'].toLowerCase(); // Asegúrate de que 'description' sea el campo correcto
+     String queryLower = query.toLowerCase();
+     return name.contains(queryLower) || description.contains(queryLower); // Filtrar por nombre o descripción
+     }).toList();
     });
   }
   void _editCategoria(BuildContext context, Map<String, dynamic> categoria) {

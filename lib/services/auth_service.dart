@@ -405,6 +405,7 @@ Future<Map<String, dynamic>> getArticuloDetailByID(int id) async {
 
   // Método para editar un artículo
   Future<void> editArticulo(int id, String name, String description, double price, int stock, int category, double warrantyperiod, File? selectedImage) async {
+  await refreshIfNeeded(); 
   final token = await getToken();
   final url = Uri.parse('$baseUrl/articulos/$id/');
 
@@ -454,12 +455,10 @@ Future<void> deleteArticulo(int id) async {
     throw Exception('Error al eliminar el artículo: ${response.body}');
   }
 }
-//ARTICULOS FAV
-//Obtener articulos favoritos
-
 //CATEGORIAS
   // Método para editar una categoría
   Future<void> editCategoria(int id, String name, String description) async {
+    await refreshIfNeeded(); 
     final token = await getToken();
     final url = Uri.parse('$baseUrl/categorias/update/$id/');
 
@@ -499,9 +498,6 @@ Future<void> deleteArticulo(int id) async {
       throw Exception('Error al eliminar la categoría: ${response.body}');
     }
   }
-
-
-
 
 //articulos fav
  // Función para agregar un artículo a favoritos
@@ -557,201 +553,6 @@ Future<void> eliminarDeFavoritos(String articleId) async {
   }
 }
 
-
-Future<void> toggleFavorito(int articuloId) async {
-  final token = await getToken();
-  final url = '$baseUrl/favoritos/';
-
-  try {
-    final response = await http.post(
-      Uri.parse(url),
-      headers: {
-        'Authorization': 'Bearer $token',
-        'Content-Type': 'application/json',
-      },
-      body: jsonEncode({'articulo_id': articuloId}),
-    );
-
-    if (response.statusCode != 200) {
-      // Muestra el cuerpo de la respuesta para depuración en caso de error
-      final error = jsonDecode(response.body);
-      throw Exception('Error al agregar/eliminar artículo de favoritos: ${error['detail']}');
-    }
-  } catch (e) {
-    print('Error: $e');
-    rethrow; // Relanza el error para que pueda ser capturado en otras partes si es necesario
-  }
-}
-
-//FILTROSSS
-Future<List<dynamic>> getArticulosMayorAMenorPrecio() async {
-  await refreshIfNeeded();
-  final token = await getToken();
-  final url = Uri.parse('$baseUrl/articulos/precio/mayor/');
-
-  final response = await http.get(
-    url,
-    headers: {
-      'Authorization': 'Bearer $token',
-      'Content-Type': 'application/json',
-    },
-  );
-
-  if (response.statusCode == 200) {
-    final jsonResponse = jsonDecode(response.body);
-    return jsonResponse['data'] ?? [];
-  } else {
-    throw Exception('Error al obtener los artículos de mayor a menor precio: ${response.body}');
-  }
-}
-
-Future<List<dynamic>> getArticulosMenorAMayorPrecio() async {
-  await refreshIfNeeded();
-  final token = await getToken();
-  final url = Uri.parse('$baseUrl/articulos/precio/menor/');
-
-  final response = await http.get(
-    url,
-    headers: {
-      'Authorization': 'Bearer $token',
-      'Content-Type': 'application/json',
-    },
-  );
-
-  if (response.statusCode == 200) {
-    final jsonResponse = jsonDecode(response.body);
-    return jsonResponse['data'] ?? [];
-  } else {
-    throw Exception('Error al obtener los artículos de menor a mayor precio: ${response.body}');
-  }
-}
-
-Future<List<dynamic>> getArticulosViejoANuevo() async {
-  await refreshIfNeeded();
-  final token = await getToken();
-  final url = Uri.parse('$baseUrl/articulos/tiempo/viejo/');
-
-  final response = await http.get(
-    url,
-    headers: {
-      'Authorization': 'Bearer $token',
-      'Content-Type': 'application/json',
-    },
-  );
-
-  if (response.statusCode == 200) {
-    final jsonResponse = jsonDecode(response.body);
-    return jsonResponse['data'] ?? [];
-  } else {
-    throw Exception('Error al obtener los artículos del más viejo al más nuevo: ${response.body}');
-  }
-}
-
-Future<List<dynamic>> getArticulosNuevoAViejo() async {
-  await refreshIfNeeded();
-  final token = await getToken();
-  final url = Uri.parse('$baseUrl/articulos/tiempo/nuevo/');
-
-  final response = await http.get(
-    url,
-    headers: {
-      'Authorization': 'Bearer $token',
-      'Content-Type': 'application/json',
-    },
-  );
-
-  if (response.statusCode == 200) {
-    final jsonResponse = jsonDecode(response.body);
-    return jsonResponse['data'] ?? [];
-  } else {
-    throw Exception('Error al obtener los artículos del más nuevo al más viejo: ${response.body}');
-  }
-}
-
-Future<List<dynamic>> getArticulosMayorStock() async {
-  await refreshIfNeeded();
-  final token = await getToken();
-  final url = Uri.parse('$baseUrl/articulos/stock/mayor/');
-
-  final response = await http.get(
-    url,
-    headers: {
-      'Authorization': 'Bearer $token',
-      'Content-Type': 'application/json',
-    },
-  );
-
-  if (response.statusCode == 200) {
-    final jsonResponse = jsonDecode(response.body);
-    return jsonResponse['data'] ?? [];
-  } else {
-    throw Exception('Error al obtener los artículos de mayor a menor stock: ${response.body}');
-  }
-}
-
-Future<List<dynamic>> getArticulosMenorStock() async {
-  await refreshIfNeeded();
-  final token = await getToken();
-  final url = Uri.parse('$baseUrl/articulos/stock/menor/');
-
-  final response = await http.get(
-    url,
-    headers: {
-      'Authorization': 'Bearer $token',
-      'Content-Type': 'application/json',
-    },
-  );
-
-  if (response.statusCode == 200) {
-    final jsonResponse = jsonDecode(response.body);
-    return jsonResponse['data'] ?? [];
-  } else {
-    throw Exception('Error al obtener los artículos de menor a mayor stock: ${response.body}');
-  }
-}
-
-Future<List<dynamic>> getArticulosMayorWarranty() async {
-  await refreshIfNeeded();
-  final token = await getToken();
-  final url = Uri.parse('$baseUrl/articulos/warranty/mayor/');
-
-  final response = await http.get(
-    url,
-    headers: {
-      'Authorization': 'Bearer $token',
-      'Content-Type': 'application/json',
-    },
-  );
-
-  if (response.statusCode == 200) {
-    final jsonResponse = jsonDecode(response.body);
-    return jsonResponse['data'] ?? [];
-  } else {
-    throw Exception('Error al obtener los artículos con mayor garantía: ${response.body}');
-  }
-}
-
-Future<List<dynamic>> getArticulosMenorWarranty() async {
-  await refreshIfNeeded();
-  final token = await getToken();
-  final url = Uri.parse('$baseUrl/articulos/warranty/menor/');
-
-  final response = await http.get(
-    url,
-    headers: {
-      'Authorization': 'Bearer $token',
-      'Content-Type': 'application/json',
-    },
-  );
-
-  if (response.statusCode == 200) {
-    final jsonResponse = jsonDecode(response.body);
-    return jsonResponse['data'] ?? [];
-  } else {
-    throw Exception('Error al obtener los artículos con menor garantía: ${response.body}');
-  }
-}
-
 // Función para obtener artículos por nombre
 Future<List<dynamic>> getArticuloByName(String name) async {
   await refreshIfNeeded(); // Verifica y refresca el token si es necesario
@@ -793,7 +594,6 @@ Future<List<dynamic>> getCategoriaByName(String name) async {
       'Content-Type': 'application/json',
     },
   );
-
   // Imprime la respuesta para depuración
   print('Respuesta del servidor: ${response.body}');
 
