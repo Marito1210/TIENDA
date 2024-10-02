@@ -35,6 +35,8 @@ dependencies:
   flutter_secure_storage: ^9.2.2
   mime: ^1.0.6
   http_parser: ^4.0.2  # Cambiado a una versión compatible
+  flutter_speed_dial: ^7.0.0
+  data_table_2: ^2.5.15
 
 
 

@@ -18,7 +18,7 @@ class _MenuScreenState extends State<MenuScreen> {
   // Lista de widgets para cada opción del menú
   static final List<Widget> _widgetOptions = <Widget>[
     ProfileScreen(),
-    const ArticlesScreen(),
+   ArticlesScreen(),
     UsersScreen(),
     const ChatbootScreen(),
   ];

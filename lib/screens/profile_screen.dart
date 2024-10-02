@@ -7,7 +7,6 @@ class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
 
   @override
-  // ignore: library_private_types_in_public_api
   _ProfileScreenState createState() => _ProfileScreenState();
 }
 
@@ -50,17 +49,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
     try {
       await authService.updateProfile(username, email, password, _image);
       fetchUserProfile(); // Refrescar el perfil después de actualizarlo
-      // ignore: use_build_context_synchronously
       Navigator.of(context).pop(); // Cerrar el diálogo
-      // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
         content: Text('Perfil actualizado con éxito'),
         backgroundColor: Colors.green,
       ));
     } catch (e) {
-      // ignore: avoid_print
       print('Error al actualizar el perfil: $e');
-      // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text('Error al actualizar el perfil: $e'),
         backgroundColor: Colors.red,
@@ -76,7 +71,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         content: Text('Perfil eliminado con éxito'),
         backgroundColor: Colors.green,
       ));
-      // Puedes redirigir a la pantalla de inicio de sesión o cualquier otra pantalla aquí
+      // Redirigir a la pantalla de inicio de sesión o cualquier otra pantalla aquí
     } catch (e) {
       print('Error al eliminar el perfil: $e');
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -153,6 +148,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
+  Future<void> _logout() async {
+    try {
+      await authService.logout(); // Llama a la función logout
+      Navigator.of(context).pushReplacementNamed('/'); // Redirige a la pantalla de inicio de sesión
+    } catch (e) {
+      print('Error al cerrar sesión: $e');
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Error al cerrar sesión: $e'),
+        backgroundColor: Colors.red,
+      ));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -161,13 +169,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
         backgroundColor: Colors.purple,
         actions: [
           PopupMenuButton<String>(
-            icon: const Icon(Icons.more_vert, color: Colors.white, ), // Icono de tres puntos
-             
+            icon: const Icon(Icons.more_vert, color: Colors.white),
             onSelected: (String result) {
               if (result == 'update') {
                 _showUpdateProfileDialog(); // Muestra el diálogo de actualización de perfil
               } else if (result == 'delete') {
                 _deleteProfile(); // Llama a la función para eliminar el perfil
+              } else if (result == 'logout') {
+                _logout(); // Cierra la sesión
               }
             },
             itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
@@ -178,6 +187,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
               const PopupMenuItem<String>(
                 value: 'delete',
                 child: Text('Eliminar perfil'),
+              ),
+              const PopupMenuItem<String>(
+                value: 'logout',
+                child: Text('Cerrar sesión'),
               ),
             ],
           ),
